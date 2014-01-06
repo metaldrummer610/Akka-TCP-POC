@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
  * @author Robert.Diaz
  * @since 1.0, 01/06/2014
  */
-public class Packet implements Transformable<Packet>, Serializable {
+public class RequestPacket implements Transformable, Serializable {
     /**
      * Represents a person packet
      */
@@ -31,8 +31,8 @@ public class Packet implements Transformable<Packet>, Serializable {
     /**
      * The type of the packet. This is one of the above types
      *
-     * @see Packet.TYPE_PERSON
-     * @see Packet.TYPE_PET
+     * @see RequestPacket.TYPE_PERSON
+     * @see RequestPacket.TYPE_PET
      */
     private int type;
 
@@ -40,6 +40,21 @@ public class Packet implements Transformable<Packet>, Serializable {
      * The payload of the packet. This is supposed to be a json string
      */
     private String payload;
+
+    /**
+     * Default constructor
+     */
+    public RequestPacket() {
+    }
+
+    /**
+     * Helper constructor that takes an incoming byte buffer and deserializes it into a packet
+     *
+     * @param buffer The incoming byte buffer
+     */
+    public RequestPacket(ByteBuffer buffer) {
+        fromBuffer(buffer);
+    }
 
     @Override
     public ByteBuffer toBuffer() {
@@ -53,18 +68,24 @@ public class Packet implements Transformable<Packet>, Serializable {
     }
 
     @Override
-    public Packet fromBuffer(ByteBuffer buffer) {
-        Packet packet = new Packet();
-        packet.id = buffer.getInt();
-        packet.type = buffer.getInt();
+    public void fromBuffer(ByteBuffer buffer) {
+        id = buffer.getInt();
+        type = buffer.getInt();
 
         int payloadLength = buffer.getInt();
         byte[] payloadBytes = new byte[payloadLength];
         buffer.get(payloadBytes);
 
-        packet.payload = new String(payloadBytes, Charset.forName("utf-8"));
+        payload = new String(payloadBytes, Charset.forName("utf-8"));
+    }
 
-        return packet;
+    @Override
+    public String toString() {
+        return "RequestPacket{" +
+                "id=" + id +
+                ", type=" + type +
+                ", payload='" + payload + '\'' +
+                "} " + super.toString();
     }
 
     public int getId() {

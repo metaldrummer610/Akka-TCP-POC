@@ -5,11 +5,10 @@ import java.nio.ByteBuffer;
 /**
  * Denotes a class as being able to be turned into a {@link ByteBuffer} and back
  *
- * @param <T> The type of the class
  * @author Robert.Diaz
  * @since 1.0, 01/06/2014
  */
-public interface Transformable<T> {
+public interface Transformable {
     /**
      * Turns the object into a ByteBuffer
      *
@@ -23,5 +22,5 @@ public interface Transformable<T> {
      * @param buffer The buffer used to create the new object
      * @return The new object
      */
-    public T fromBuffer(ByteBuffer buffer);
+    public void fromBuffer(ByteBuffer buffer);
 }
