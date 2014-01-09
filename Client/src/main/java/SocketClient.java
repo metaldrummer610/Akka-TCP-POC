@@ -58,7 +58,7 @@ public class SocketClient extends Thread {
         for (int i = 0; i < iterations; i++) {
             try {
                 int interval = getInterval();
-                logger.info("Sleep interval: " + interval);
+                logger.debug("Sleep interval: " + interval);
                 Thread.sleep(interval);
             }
             catch (Exception e) {
@@ -110,7 +110,7 @@ public class SocketClient extends Thread {
         RequestPacket pkt = new RequestPacket();
         pkt.setId((new Random()).nextInt());
 
-        logger.info("Packet id: " + pkt.getId());
+        logger.debug("Packet id: " + pkt.getId());
 
         Gson gson = new Gson();
         if (getRandomBoolean()) {
@@ -122,12 +122,10 @@ public class SocketClient extends Thread {
             pkt.setPayload(gson.toJson(getPet()));
         }
 
-        pkt.setPayload(gson.toString());
-
         try {
             out.write(pkt.toBuffer().array());
             out.flush();
-            logger.info("Packet written to the outbound buffer.");
+            logger.debug("Packet written to the outbound buffer.");
         }
         catch (Exception e) {
             logger.error("Problems encountered while sending data packet: ", e);
@@ -136,7 +134,7 @@ public class SocketClient extends Thread {
         try {
             ResponsePacket response = readFromBuffer();
 
-            logger.info("MESSAGE RECIEVED: ");
+            logger.debug("MESSAGE RECIEVED: ");
 
             String errors = response.getFailureReason();
             int id = response.getId();
@@ -153,12 +151,10 @@ public class SocketClient extends Thread {
 
     private ResponsePacket readFromBuffer() {
         byte[] buffer = new byte[1024];
+        ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 
-        ByteBuffer byteBuffer = ByteBuffer.allocate(4096);
         try {
-            while(in.read(buffer) != -1) {
-                byteBuffer.put(buffer);
-            }
+            theSocket.getInputStream().read(buffer);
         }
         catch (Exception e) {
             logger.error(e);

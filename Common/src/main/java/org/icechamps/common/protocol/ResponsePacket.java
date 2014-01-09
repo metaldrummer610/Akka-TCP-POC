@@ -42,7 +42,7 @@ public class ResponsePacket implements Transformable {
             buffer.put(failureReason.getBytes(Charset.forName("utf-8")));
         }
 
-        return buffer;
+        return (ByteBuffer) buffer.flip();
     }
 
     @Override

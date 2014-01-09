@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: log4j-1.2.17.jar gson-2.2.2.jar
+Main-Class: ClientManager
+

@@ -9,13 +9,13 @@ import org.apache.log4j.BasicConfigurator;
  */
 public class ClientManager {
 
-    private static int clients = 500;
+    private static int clients = 2000;
 
     public static void main(String[] args) {
         BasicConfigurator.configure();
 
         for (int i = 0; i < clients; i++) {
-            SocketClient client = new SocketClient("localhost", 9008, 50, 300);
+            SocketClient client = new SocketClient("localhost", 9008, 100, 300);
             client.start();
         }
 

@@ -63,7 +63,7 @@ public class TcpServerActor extends UntypedActor {
             final Tcp.Connected conn = (Tcp.Connected) message;
             manager.tell(conn, getSelf());
 
-            final ActorRef handler = getContext().actorOf(Props.create(JsonHandler.class), "JsonHandler::" + UUID.randomUUID().toString());
+            final ActorRef handler = getContext().actorOf(Props.create(JsonHandler.class, getSender()), "JsonHandler::" + UUID.randomUUID().toString());
             getSender().tell(TcpMessage.register(handler), getSelf());
         }
     }

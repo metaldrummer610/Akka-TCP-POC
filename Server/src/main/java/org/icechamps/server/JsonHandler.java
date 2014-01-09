@@ -1,5 +1,6 @@
 package org.icechamps.server;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
@@ -18,11 +19,19 @@ import org.icechamps.common.protocol.ResponsePacket;
  */
 public class JsonHandler extends UntypedActor {
     private final Gson gson = new Gson();
-    LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private LoggingAdapter log = Logging.getLogger(getContext().system(), this);
+    private ActorRef connection;
+
+    public JsonHandler(ActorRef connection) {
+        log.info("Connection: {}", connection);
+        this.connection = connection;
+
+        getContext().watch(connection);
+    }
 
     @Override
     public void onReceive(Object message) throws Exception {
-        log.info(message.toString());
+        log.debug(message.toString());
         if (message instanceof Tcp.Received) {
             final ByteString data = ((Tcp.Received) message).data();
             handle(data);
@@ -30,22 +39,27 @@ public class JsonHandler extends UntypedActor {
             log.info("Connection closed");
             getContext().stop(getSelf());
         } else {
+            log.warning("The following message is unhandled: {}", message);
             unhandled(message);
         }
     }
 
     private void handle(ByteString data) {
-        log.info("Received: " + data.compact().utf8String());
+        log.debug("Received: " + data.compact().utf8String());
         RequestPacket requestPacket = new RequestPacket(data.toByteBuffer());
 
-        log.info("Parsed the following requestPacket: " + requestPacket.toString());
+        log.debug("Parsed the following requestPacket: " + requestPacket.toString());
 
         ResponsePacket responsePacket = new ResponsePacket();
         responsePacket.setId(requestPacket.getId());
         responsePacket.setType(requestPacket.getType());
         responsePacket.setSuccess(true);
 
-        getSender().tell(TcpMessage.write(ByteString.fromByteBuffer(responsePacket.toBuffer())), getSelf());
+        ByteString response = ByteString.fromByteBuffer(responsePacket.toBuffer());
+        log.debug("Response: {}", response.compact().utf8String());
+
+        connection.tell(TcpMessage.write(response), getSelf());
+        log.debug("Wrote response");
     }
 }
 

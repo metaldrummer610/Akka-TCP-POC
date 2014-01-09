@@ -64,7 +64,7 @@ public class RequestPacket implements Transformable, Serializable {
         buffer.putInt(payload.length());
         buffer.put(payload.getBytes(Charset.forName("utf-8")));
 
-        return buffer;
+        return (ByteBuffer) buffer.flip();
     }
 
     @Override
